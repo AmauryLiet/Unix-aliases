@@ -1,0 +1,110 @@
+
+# Git
+#
+# # hub
+alias git=hub
+#
+# # typo
+alias gti=git
+alias giit=git
+alias gt=git
+alias gitp=git
+alias gi=git
+alias it=git
+alias got=git
+alias gut=git
+alias goit=git
+alias gpa=gap
+#
+# # shortcut
+alias gl='git log'
+alias gs='git s'
+alias gaa='git add . -N'
+alias gap='git add -p'
+alias grh='git reset HEAD'
+alias gci='git ci'
+alias gcm='git cm'
+alias gd='git diff'
+alias gdh='git diff HEAD~$1'
+alias gds='git diff --staged'
+alias game='git amend'
+alias gco='git co'
+alias gcoi='git checkout integration'
+alias gcom='git checkout master'
+alias gcos='git checkout staging'
+alias gcb='git cb'
+alias gpull='git pull'
+alias gpl='git pull'
+alias gr='git reset'
+alias gbr='git br'
+alias grb='git rebase'
+alias grbi='git rebase -i'
+alias grbii='git rebase -i integration'
+alias grbis='git rebase -i staging'
+alias gpy='git pull && yarn'
+
+unalias gsu || :
+gsu() {
+  branch=$(git symbolic-ref --short HEAD)
+  git branch --set-upstream-to=origin/$branch $branch
+}
+
+#
+# # Git stash
+alias gsa='git stash'
+alias gsam='git stash save --'
+alias gsa:l='git stash list'
+alias gsa:s='git stash show -p'
+alias gsa:p='git stash pop'
+alias gsa:l='git stash list'
+
+# yarn
+#
+# # Commons
+alias yt='yarn test'
+alias ytl='yarn test:lint'
+alias ylf='yarn eslint . --fix'
+alias ytf='yarn test:flow'
+alias ytu='yarn test:unit'
+alias ytc='yarn test:coverage'
+alias ytfc='yarn test:flow:coverage'
+alias ytuu='ytu -u'
+alias ytuw='ytu --watch'
+alias ytw='ytf && ytl && ytuw'
+alias y=yarn
+
+# Jump
+alias j=jump
+
+# Python
+alias pym='python manage.py'
+
+# Common typos
+alias jum=jump
+alias pyhton=python
+alias pytohn=python
+alias wihch=which
+alias hlep=help
+
+# Safety
+alias rm='rm -i'
+alias mv='mv -i'
+
+# System
+alias ll='ls -shAl'
+
+# ngrok
+alias ngrok='~/ngrok/ngrok'
+
+gpr() {
+  git push
+  TITLE="${"$(git rev-parse --abbrev-ref HEAD)"//-/ }"
+  MESSAGE=$(echo $TITLE | cat - ./.github/PULL_REQUEST_TEMPLATE.md)
+  hub pull-request -m "${MESSAGE}" --browse
+}
+
+# Project specifics
+ALIAS_DIR=$(dirname $0)
+source $ALIAS_DIR/.aliases_panda
+source $ALIAS_DIR/.aliases_global-resources
+

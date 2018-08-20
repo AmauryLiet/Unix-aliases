@@ -1,0 +1,13 @@
+# yarn
+alias ydu='yarn dev:up'
+alias ydd='yarn dev:down'
+alias ylfp='cd ~/git/panda-stack/api && ylf && cd - && cd ~/git/panda-stack/app && ylf && cd -'
+alias ydca='yarn dev:connect:api'
+alias ydi='yarn dev:install'
+alias ydun='yarn dev:uninstall'
+
+# Jump
+alias japp='jump app'
+alias japi='jump api'
+alias jpan='jump panda'
+

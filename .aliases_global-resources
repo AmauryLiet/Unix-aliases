@@ -1,0 +1,6 @@
+
+alias sms="(j ms && vagrant up)"
+alias jgr="jump gr"
+alias rgm="echo \"/applis/tnuv/scripts/gaia-mock-api_restart.sh\" | ssh sg-vagrant"
+alias ys="yarn start"
+
