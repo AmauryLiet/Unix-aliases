@@ -1,107 +1,284 @@
 
 # Git
-#
-# # hub
-alias git=hub
-#
-# # typo
-alias gti=git
-alias giit=git
-alias gt=git
-alias gitp=git
-alias gi=git
-alias it=git
-alias got=git
-alias gut=git
-alias goit=git
+# # typos
 alias gpa=gap
-#
+alias lg=gl
+alias gsd=gds
+alias gao=gap
+# alias gti=git
+# alias giit=git
+# alias gt=git
+# alias gitp=git
+# alias gi=git
+# alias it=git
+# alias got=git
+# alias gut=git
+# alias goit=git
+alias gocm=gcom
+alias gocs=gcos
+alias gocd=gcod
 # # shortcut
 alias gl='git log'
 alias gs='git s'
-alias gaa='git add . -N'
+alias gaa='git add -N'
 alias gap='git add -p'
 alias grh='git reset HEAD'
 alias gci='git ci'
 alias gcm='git cm'
 alias gd='git diff'
-alias gdh='git diff HEAD~$1'
-alias gds='git diff --staged'
 alias game='git amend'
+alias gf='git fetch'
+alias gr='git reset'
+alias gbr='git br'
+alias gcb='git cb'
+# # tools: pull
+alias gpl='gsu && git pull'
+# # tools: checkout
 alias gco='git co'
 alias gcoi='git checkout integration'
 alias gcom='git checkout master'
 alias gcos='git checkout staging'
-alias gcb='git cb'
-alias gpull='git pull'
-alias gpl='git pull'
-alias gr='git reset'
-alias gbr='git br'
+alias gcod='git checkout develop'
+# # tools: rebase
 alias grb='git rebase'
 alias grbi='git rebase -i'
-alias grbii='git rebase -i integration'
-alias grbis='git rebase -i staging'
-alias gpy='git pull && yarn'
-
-unalias gsu || :
-gsu() {
-  branch=$(git symbolic-ref --short HEAD)
-  git branch --set-upstream-to=origin/$branch $branch
-}
-
-#
-# # Git stash
+alias grbii='git rebase -i origin/integration'
+alias grbis='git rebase -i origin/staging'
+alias grbim='git rebase -i origin/master'
+alias grbid='git rebase -i origin/develop'
+grap() { gr $1 $2 $3 && gap $1 $2 $3 }
+# # tools: diff
+alias gdc='git diff --color-words=.'
+alias gds='gd --staged'
+alias gdcs='git diff --staged --color-words=.'
+alias gdsc='gdcs'
+alias gdo='gd origin/$(branch)'
+gdh() { echo gd HEAD~$1 HEAD~$(($1-1)) $2 $3 && gd HEAD~$1 HEAD~$(($1-1)) $2 $3 }
+# # tools: stash
 alias gsa='git stash'
 alias gsam='git stash save --'
 alias gsa:l='git stash list'
 alias gsa:s='git stash show -p'
 alias gsa:p='git stash pop'
-alias gsa:l='git stash list'
-
-# yarn
-#
-# # Commons
-alias yt='yarn test'
-alias ytl='yarn test:lint'
-alias ylf='yarn eslint . --fix'
-alias ytf='yarn test:flow'
-alias ytu='yarn test:unit'
-alias ytc='yarn test:coverage'
-alias ytfc='yarn test:flow:coverage'
-alias ytuu='ytu -u'
-alias ytuw='ytu --watch'
-alias ytw='ytf && ytl && ytuw'
-alias y=yarn
-
-# Jump
-alias j=jump
-
-# Python
-alias pym='python manage.py'
-
-# Common typos
-alias jum=jump
-alias pyhton=python
-alias pytohn=python
-alias wihch=which
-alias hlep=help
-
-# Safety
-alias rm='rm -i'
-alias mv='mv -i'
-
-# System
-alias ll='ls -shAl'
-
-# ngrok
-alias ngrok='~/ngrok/ngrok'
-
+alias gsa:a='git stash apply'
+# # tools: branch
+alias branch='git symbolic-ref --short HEAD'
+alias br='branch'
+alias def_branch='git remote show origin | grep "HEAD branch" | cut -d ":" -f 2 | cut -d " " -f 2'
+alias gco_def='gco $(def_branch)'
+alias gcop_def='gco_def && gpl'
+alias grb_def='gcop_def && gco . -p && gco - && grb $(def_branch)'
+alias gd_def='gd $(def_branch)'
+# # tools: logs
+alias glo='gl --graph $(branch) origin/$(branch)'
+alias glg='git log --graph $(branch)'
+# # tools: other
+alias ci='gl -1 | head -1 | egrep "(\w|\d)+$"'
+gfu() {
+  COMMIT=$(git log --pretty=oneline | fzf | awk '{print $1}')
+  git commit --fixup $COMMIT
+  GIT_SEQUENCE_EDITOR=: git rebase --autostash --autosquash -i $COMMIT~1
+}
+alias commit0='git hash-object -t tree /dev/null'
+unalias gsu 2>/dev/null || :
+gsu() {
+  branch=$(git symbolic-ref --short HEAD)
+  git branch --set-upstream-to=origin/$branch $branch
+}
+# # github
+alias git=hub
+alias pr_https_github='echo "https://github.com/$(g remote get-url origin | cut -d"/" -f4-5 | cut -d"." -f1)/pull/$(branch)"'
+alias pr_https_bitbucket='exit 42' ## TODO: implement
+alias pr_https='pr_https_github' ## TODO: if statement
+alias pr_ssh_github='echo "https://github.com/$(g remote get-url origin | cut -d":" -f2 | cut -d"." -f1)/pull/$(branch)"'
+alias pr_ssh_bitbucket='exit 42' ## TODO: implement
+alias pr_ssh='pr_ssh_github' ## TODO: if statement
+alias pr='if [[ $(g remote get-url origin) == *"https"* ]]; then echo $(pr_https); else echo $(pr_ssh); fi;'
+alias cpr='echo $(pr) | pbcopy'
+alias opr='open $(pr)'
 gpr() {
   git push
   TITLE="${"$(git rev-parse --abbrev-ref HEAD)"//-/ }"
   MESSAGE=$(echo $TITLE | cat - ./.github/PULL_REQUEST_TEMPLATE.md)
   hub pull-request -m "${MESSAGE}" --browse
 }
+
+# npm
+alias gpy='git pull && yarn'
+alias get_desc='cat package.json | grep '\''"description"'\'' | sed -E '\''s/ *"description": "([^"]+)",/\1/g'\'''
+alias get_vers='cat package.json | grep '\''"version"'\'' | sed -E '\''s/ *"version": "([^"]+)",/\1/g'\'''
+alias gcbv='git commit -m "Bump $(get_vers) - $(get_desc)"'
+
+alias get_vers_fastlane='cat fastlane/.env | grep "IOS_VERSION=" | cut -d"'\''" -f2'
+
+# yarn
+# # globals
+alias y=yarn
+alias yg='yarn global'
+alias ya='yarn add'
+alias yga='yarn global add'
+# # scripts
+alias yt='yarn test'
+alias yl='yarn eslint . || yarn tslint .'
+alias ytl='yarn test:lint'
+alias ylf='yarn eslint . --fix'
+alias yf='yarn flow'
+alias ytf='yarn test:flow'
+alias yj='yarn jest'
+alias ytu='yarn test:unit'
+alias ytt='yarn test:types'
+alias ytc='yarn test:coverage'
+alias ytfc='yarn test:flow:coverage'
+alias ytuu='ytu -u'
+alias ytuw='ytu --watch'
+alias ytw='ytf && ytl && ytuw'
+alias yd='yarn dev'
+
+alias ytl_warning_by_rule="ytl | egrep '\d\s{2,}warning' | awk '{print \$NF}' | sort | uniq -c | sort -r"
+alias ytl_error_by_rule="ytl | egrep '\d\s{2,}error' | awk '{print \$NF}' | sort | uniq -c | sort -r"
+
+# docker
+alias dcu='docker-compose up'
+alias dcs='docker-compose stop'
+alias dcd='docker-compose down'
+alias dce='docker-compose exec'
+alias dces='docker-compose exec server'
+alias dcec='docker-compose exec client'
+alias dcep='docker-compose exec postgresql'
+alias dc='docker-compose'
+
+# kubernetes
+source <(kubectl completion zsh)
+alias k='kubectl'
+complete -F __start_kubectl k # autocomplete
+alias mk='minikube'
+
+# Jump
+alias jum=jump
+alias marl=mark
+alias j=jump
+alias m=mark
+
+# Python
+alias pym='python manage.py'
+alias pyhton=python
+alias pytohn=python
+
+# React Native
+alias rnra="yarn react-native run-android"
+alias rnrad="rnra --deviceId"
+alias rnri="yarn react-native run-ios"
+alias rnris="rnri --simulator"
+alias rnrid="rnri --device"
+alias and_snap="adb exec-out screencap -p > ~/Desktop/S8-egde-snapshot.png"
+alias start_bundler_android="(curl -s http://localhost:8081/index.bundle\?platform\=\android\&dev\=true\&minify\=false > /dev/null &)"
+alias start_bundler_ios="(curl -s http://localhost:8081/index.bundle\?platform\=\ios\&dev\=true\&minify\=false > /dev/null &)"
+alias ys:android="((sleep 5 && start_bundler_android && sleep 120 && start_bundler_ios) & ) && ys"
+alias ys:ios="((sleep 5 && start_bundler_ios && sleep 120 && start_bundler_android) & ) && ys"
+reverse() {
+  if [ -n "$1" ]; then
+    adb -s $1 reverse tcp:8081 tcp:8081
+  else
+    adb reverse tcp:8081 tcp:8081
+  fi
+}
+rr() {
+  if [ -n "$1" ]; then
+    adb -s $1 shell input keyevent RR && adb -s $1 shell input keyevent 82
+  else
+    adb shell input keyevent RR && adb shell input keyevent 82
+  fi
+}
+rrr() {
+  if [ -n "$1" ]; then
+    reverse $1 && rr $1
+  else
+    reverse && rr
+  fi
+}
+alias ee=rr
+alias tt=rr
+alias eee=rrr
+alias ttt=rrr
+adb-wait() {
+  if [ -n "$1" ]; then
+    adb -s $1 wait-for-device && adb devices
+  else
+    adb wait-for-device && adb devices
+  fi
+}
+alias adbw="adb-wait"
+apk_start() {
+  appt_path="$ANDROID_HOME/build-tools/29.0.2/aapt"
+
+  package_name=$($appt_path dump badging $1 | grep "package:" | cut -d"'" -f2)
+  activity_name=$($appt_path dump badging $1 | grep "launchable-activity:" | cut -d"'" -f2)
+  adb shell am start "$package_name/$activity_name"
+}
+apk_install() {
+  adb install $1
+  apk_start $1
+}
+
+quick_node () {
+  FILE_NAME=quick_node.js
+  PORT=${1-3000}
+  if [ ! -f $FILE_NAME ]; then
+  cat > $FILE_NAME <<- EOM
+const express = require('express')
+const app = express();
+const port = $PORT;
+
+app.get('/', (req, res) => res.send('Hello World!'));
+
+app.listen(port, () => console.log(\`Example app listening on port \${port}!\`));
+EOM
+  ;
+  fi
+
+  open "http://localhost:$PORT"
+  open $FILE_NAME
+  nodemon $FILE_NAME
+}
+
+# macOS
+alias o=open
+alias ll='ls -shAl'
+alias rm='rm -i'
+alias mv='mv -i'
+alias egrep="egrep --color=auto"
+alias wihch=which
+alias hlep=help
+alias pc='pbcopy'
+
+# ngrok
+alias ngrok='~/ngrok/ngrok'
+
+# # intellij
+alias c=pycharm
+alias c.='c $(pwd)'
+# # Android Studio
+alias s=studio
+alias s.='studio .'
+
+# time
+def start(){ __start=`date +%s` }
+def stop(){ echo $((`date +%s` - __start)) }
+
+# xcode
+alias xcode_version='less /Applications/Xcode.app/Contents/version.plist | head -10 | tail -1 | cut -d">" -f2 | cut -d"<" -f1'
+alias xcode_build='less /Applications/Xcode.app/Contents/version.plist | head -14 | tail -1 | cut -d">" -f2 | cut -d"<" -f1'
+alias xcodeselect_version='xcode-select -v | cut -d" " -f3 | cut -d"." -f1'
+alias ows="o */*space *space"
+alias os="ows"
+alias o.='o .'
+
+# gem
+alias be='bundle exec'
+alias bi='bundle install'
+
+# Wheeliz
+alias dphp="docker-compose exec --user www-data php bash"
 
 # Project specifics
 ALIAS_DIR=$(dirname $0)
